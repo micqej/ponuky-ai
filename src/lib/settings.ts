@@ -1,4 +1,7 @@
+import type { Company } from './quote'
+
 export interface AppSettings {
+  companies: Company[]
   openaiKey: string
   anthropicKey: string
   googleKey: string
@@ -15,14 +18,25 @@ export function loadSettings(): AppSettings {
   }
 }
 
-export function getApiKeys(settings: AppSettings) {
+export function saveSettings(s: AppSettings) {
+  localStorage.setItem('ponuky-ai-settings', JSON.stringify(s))
+}
+
+export function getApiKeys(s: AppSettings) {
   return {
-    openai: settings.openaiKey || undefined,
-    anthropic: settings.anthropicKey || undefined,
-    google: settings.googleKey || undefined,
+    openai: s.openaiKey || undefined,
+    anthropic: s.anthropicKey || undefined,
+    google: s.googleKey || undefined,
   }
 }
 
 function defaults(): AppSettings {
-  return { openaiKey: '', anthropicKey: '', googleKey: '', provider: 'openai', model: 'gpt-4o-mini' }
+  return {
+    companies: [],
+    openaiKey: '',
+    anthropicKey: '',
+    googleKey: '',
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+  }
 }
