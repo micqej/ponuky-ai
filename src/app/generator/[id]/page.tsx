@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { AI_MODELS } from '@/lib/ai-providers'
+import { loadSettings, getApiKeys } from '@/lib/settings'
 import Link from 'next/link'
 
 export default function GeneratorPage() {
@@ -20,12 +21,9 @@ export default function GeneratorPage() {
   const resultRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const saved = localStorage.getItem('ponuky-ai-settings')
-    if (saved) {
-      const s = JSON.parse(saved)
-      if (s.provider) setProvider(s.provider)
-      if (s.model) setModel(s.model)
-    }
+    const s = loadSettings()
+    setProvider(s.provider)
+    setModel(s.model)
   }, [])
 
   const availableModels = AI_MODELS.filter(m => m.provider === provider)
@@ -65,6 +63,7 @@ export default function GeneratorPage() {
           userPrompt: buildPrompt(),
           provider,
           model,
+          apiKeys: getApiKeys(loadSettings()),
         }),
       })
       const data = await res.json()
@@ -217,9 +216,9 @@ export default function GeneratorPage() {
           {error && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
               <strong>Chyba:</strong> {error}
-              {error.includes('API') && (
+              {(error.includes('kľúč') || error.includes('API')) && (
                 <div className="mt-2">
-                  <Link href="/settings" className="underline">Nastav API kľúče v Nastaveniach →</Link>
+                  <Link href="/settings" className="underline font-medium">Nastav API kľúče v Nastaveniach →</Link>
                 </div>
               )}
             </div>

@@ -39,9 +39,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Info banner */}
-      <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
-        <strong>⚠️ Bezpečnosť:</strong> API kľúče sú uložené len v tvojom prehliadači (localStorage).
-        Pre produkčné nasadenie nastav kľúče cez Vercel Environment Variables.
+      <div className="mb-6 p-4 bg-sky-50 border border-sky-200 rounded-xl text-sky-800 text-sm">
+        <strong>ℹ️ Ako to funguje:</strong> API kľúče zadáš tu — uložia sa v tvojom prehliadači a automaticky sa použijú pri každom generovaní. Nič viac nepotrebuješ nastavovať.
       </div>
 
       <div className="card p-6 space-y-6">
@@ -51,6 +50,7 @@ export default function SettingsPage() {
             <span className="text-lg">🤖</span>
             <h3 className="font-semibold text-slate-900">OpenAI</h3>
             <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Odporúčané</span>
+            {openaiKey && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">✓ Nastavený</span>}
           </div>
           <label className="block text-sm text-slate-600 mb-1">API kľúč</label>
           <input
@@ -73,6 +73,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">🧠</span>
             <h3 className="font-semibold text-slate-900">Anthropic (Claude)</h3>
+            {anthropicKey && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">✓ Nastavený</span>}
           </div>
           <label className="block text-sm text-slate-600 mb-1">API kľúč</label>
           <input
@@ -96,6 +97,7 @@ export default function SettingsPage() {
             <span className="text-lg">✨</span>
             <h3 className="font-semibold text-slate-900">Google AI (Gemini)</h3>
             <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Free tier</span>
+            {googleKey && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">✓ Nastavený</span>}
           </div>
           <label className="block text-sm text-slate-600 mb-1">API kľúč</label>
           <input

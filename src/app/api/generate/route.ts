@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const { systemPrompt, userPrompt, provider, model } = await req.json()
+    const { systemPrompt, userPrompt, provider, model, apiKeys } = await req.json()
 
     if (!systemPrompt || !userPrompt) {
       return NextResponse.json({ error: 'Chýba prompt' }, { status: 400 })
@@ -10,14 +10,21 @@ export async function POST(req: NextRequest) {
 
     const selectedProvider = provider || process.env.DEFAULT_AI_PROVIDER || 'openai'
 
+    // apiKeys from the app settings take priority over env vars
+    const keys = {
+      openai: apiKeys?.openai || process.env.OPENAI_API_KEY,
+      anthropic: apiKeys?.anthropic || process.env.ANTHROPIC_API_KEY,
+      google: apiKeys?.google || process.env.GOOGLE_AI_API_KEY,
+    }
+
     let result: string
 
     if (selectedProvider === 'anthropic') {
-      result = await generateAnthropic(systemPrompt, userPrompt, model)
+      result = await generateAnthropic(systemPrompt, userPrompt, model, keys.anthropic)
     } else if (selectedProvider === 'google') {
-      result = await generateGoogle(systemPrompt, userPrompt, model)
+      result = await generateGoogle(systemPrompt, userPrompt, model, keys.google)
     } else {
-      result = await generateOpenAI(systemPrompt, userPrompt, model)
+      result = await generateOpenAI(systemPrompt, userPrompt, model, keys.openai)
     }
 
     return NextResponse.json({ result })
@@ -27,9 +34,8 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function generateOpenAI(system: string, user: string, model?: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) throw new Error('OPENAI_API_KEY nie je nastavený')
+async function generateOpenAI(system: string, user: string, model?: string, apiKey?: string): Promise<string> {
+  if (!apiKey) throw new Error('OpenAI API kľúč chýba. Nastav ho v Nastaveniach.')
 
   const selectedModel = model || process.env.DEFAULT_AI_MODEL || 'gpt-4o-mini'
 
@@ -56,9 +62,8 @@ async function generateOpenAI(system: string, user: string, model?: string): Pro
   return data.choices?.[0]?.message?.content ?? ''
 }
 
-async function generateAnthropic(system: string, user: string, model?: string): Promise<string> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY nie je nastavený')
+async function generateAnthropic(system: string, user: string, model?: string, apiKey?: string): Promise<string> {
+  if (!apiKey) throw new Error('Anthropic API kľúč chýba. Nastav ho v Nastaveniach.')
 
   const selectedModel = model || process.env.DEFAULT_AI_MODEL || 'claude-haiku-4-5-20251001'
 
@@ -86,9 +91,8 @@ async function generateAnthropic(system: string, user: string, model?: string): 
   return data.content?.[0]?.text ?? ''
 }
 
-async function generateGoogle(system: string, user: string, model?: string): Promise<string> {
-  const apiKey = process.env.GOOGLE_AI_API_KEY
-  if (!apiKey) throw new Error('GOOGLE_AI_API_KEY nie je nastavený')
+async function generateGoogle(system: string, user: string, model?: string, apiKey?: string): Promise<string> {
+  if (!apiKey) throw new Error('Google AI API kľúč chýba. Nastav ho v Nastaveniach.')
 
   const selectedModel = model || process.env.DEFAULT_AI_MODEL || 'gemini-1.5-flash'
 

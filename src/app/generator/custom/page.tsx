@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { AI_MODELS } from '@/lib/ai-providers'
+import { loadSettings, getApiKeys } from '@/lib/settings'
 import Link from 'next/link'
 
 const PROMPT_EXAMPLES = [
@@ -20,12 +21,9 @@ export default function CustomGeneratorPage() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('ponuky-ai-settings')
-    if (saved) {
-      const s = JSON.parse(saved)
-      if (s.provider) setProvider(s.provider)
-      if (s.model) setModel(s.model)
-    }
+    const s = loadSettings()
+    setProvider(s.provider)
+    setModel(s.model)
     const savedPrompts = localStorage.getItem('ponuky-ai-custom-prompts')
     if (savedPrompts) {
       const p = JSON.parse(savedPrompts)
@@ -60,6 +58,7 @@ export default function CustomGeneratorPage() {
           userPrompt,
           provider,
           model,
+          apiKeys: getApiKeys(loadSettings()),
         }),
       })
       const data = await res.json()
